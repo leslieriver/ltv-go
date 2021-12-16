@@ -9,14 +9,19 @@ import (
 
 type Client struct {
 	HTTPClient *http.Client
+	BaseUrl    string
 }
 
-func (mw *Client) GetPosts(ctx context.Context) ([]PostView, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://fapsi.be/api/v3/post/list", nil)
+func (c *Client) GetPosts(ctx context.Context, community string) ([]PostView, error) {
+	var query = c.BaseUrl + "/api/v3/post/list"
+	if len(community) != 0 {
+		query += "?community_name=" + community
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, query, nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not create http request: %w", err)
 	}
-	resp, err := mw.HTTPClient.Do(req)
+	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("could not fetch posts: %w", err)
 	}
