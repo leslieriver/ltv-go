@@ -44,16 +44,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.String() == "ctrl+c" {
-			tea.Quit()
+			return m, tea.Quit
 		} else if msg.String() == "enter" {
-			if m.textInput.Focused() {
-				m.textInput.Blur()
-				var trimmed = strings.Trim(m.textInput.Value(), "\n")
-				return m, m.fetchPosts(trimmed)
+			if m.state == 0 {
+				if m.textInput.Focused() {
+					m.textInput.Blur()
+					var trimmed = strings.Trim(m.textInput.Value(), "\n")
+					return m, m.fetchPosts(trimmed)
 
-			} else {
-				m.textInput.Focus()
-				m.textInput.SetValue("")
+				} else {
+					m.textInput.Focus()
+					m.textInput.SetValue("")
+				}
 			}
 		} else if msg.String() == "right" {
 			var selected = m.posts[m.list.Cursor()]
@@ -94,13 +96,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmdlist, cmdtext, cmdpost tea.Cmd
 	if m.textInput.Focused() {
 		m.textInput, cmdtext = m.textInput.Update(msg)
+		return m, cmdtext
 	} else {
-		m.list, cmdlist = m.list.Update(msg)
+		if m.state == 1 {
+			m.currentPost, cmdpost = m.currentPost.Update(msg)
+			return m, cmdpost
+		} else {
+			m.list, cmdlist = m.list.Update(msg)
+			return m, cmdlist
+		}
 	}
-	if m.state == 1 {
-		m.currentPost, cmdpost = m.currentPost.Update(msg)
-	}
-	return m, tea.Batch(cmdlist, cmdtext, cmdpost)
 }
 
 func (m model) View() string {
@@ -135,6 +140,7 @@ func main() {
 
 	m := model{textInput: ti, list: list.NewModel([]list.Item{}, list.NewDefaultDelegate(), 0, 0), lemmyapi: &lemmyapi.Client{HTTPClient: http.DefaultClient, BaseUrl: "https://fapsi.be"}, posts: []item{}, currentPost: viewport.Model{Width: 80, Height: 10}}
 	m.list.Title = "Posts"
+	m.list.DisableQuitKeybindings()
 	err := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseCellMotion()).Start()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
