@@ -12,10 +12,10 @@ type Client struct {
 	BaseUrl    string
 }
 
-func (c *Client) GetPosts(ctx context.Context, community string) ([]PostView, error) {
-	var query = c.BaseUrl + "/api/v3/post/list"
+func (c *Client) GetPosts(ctx context.Context, community string, page int) ([]PostView, error) {
+	var query = fmt.Sprintf("%s/api/v3/post/list?page=%d", c.BaseUrl, page)
 	if len(community) != 0 {
-		query += "?community_name=" + community
+		query += "&community_name=" + community
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, query, nil)
 	if err != nil {
