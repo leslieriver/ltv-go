@@ -1,5 +1,10 @@
 # ltv-go
 my attempt at rewriting [ltv](https://github.com/lunatichacker/lemmy-terminal-viewer) in go.
+<p float=left>
+<img src=https://user-images.githubusercontent.com/94739408/146679824-0a530acc-ee74-45be-b782-10677964e559.png width =300 />
+<img src =https://user-images.githubusercontent.com/94739408/146679787-52c3980f-99d2-480b-a81e-5b3bd8897f4a.png  width =200/>
+ <img src =https://user-images.githubusercontent.com/94739408/146679748-4014674a-8d3e-4c53-8a53-c99b8c07eccb.png width =200 />
+</p>
 
 ## Install and Usage
 
